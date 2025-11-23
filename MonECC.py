@@ -32,3 +32,19 @@ def mult(k, x, y):
             bx, by = add(bx, by, bx, by)
         k >>= 1
     return rx, ry
+
+def derive_secret(k, x, y):
+    sx, sy = mult(k, x, y)
+    h1 = hashlib.sha256(str(sx).encode()).digest()
+    h2 = hashlib.sha256(str(sy).encode()).digest()
+    secret = h1 + h2
+    return secret[:16], secret[16:32]
+
+def keygen():
+    qx, qy = None, None
+    while qx is None:
+        k = random.randint(1, 1000)
+        qx, qy = mult(k, Gx, Gy)
+    open('monECC.priv', 'w', encoding='utf-8').write(f'---begin monECC private key---\n{base64.b64encode(str(k).encode()).decode()}\n---end monECC key---\n')
+    open('monECC.pub', 'w', encoding='utf-8').write(f'---begin monECC public key---\n{base64.b64encode(f"{qx};{qy}".encode()).decode()}\n---end monECC key---\n')
+    print('Clés générées: monECC.priv et monECC.pub')
