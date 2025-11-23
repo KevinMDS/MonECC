@@ -5,6 +5,3 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 
 P, A, Gx, Gy = 101, 35, 2, 9
-
-if __name__ == '__main__':
-    print("TP ECC - en cours de développement")
