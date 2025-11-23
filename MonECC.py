@@ -82,6 +82,7 @@ def decrypt(privfile, ciphertext):
     
     iv, key = derive_secret(k, kGx, kGy)
     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
-    padded = cipher.decryptor().update(ct) + cipher.decryptor().finalize()  # BUG ICI
+    decryptor = cipher.decryptor()
+    padded = decryptor.update(ct) + decryptor.finalize()
     unpadder = padding.PKCS7(128).unpadder()
     print((unpadder.update(padded) + unpadder.finalize()).decode())
