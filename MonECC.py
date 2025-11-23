@@ -86,3 +86,28 @@ def decrypt(privfile, ciphertext):
     padded = decryptor.update(ct) + decryptor.finalize()
     unpadder = padding.PKCS7(128).unpadder()
     print((unpadder.update(padded) + unpadder.finalize()).decode())
+
+def help():
+    print("""Script monECC
+
+Syntaxe :
+    python monECC.py <commande> [<clé>] [<texte>]
+
+Commandes :
+    keygen   : Génère une paire de clés
+    crypt    : Chiffre <texte> avec la clé publique <clé>
+    decrypt  : Déchiffre <texte> avec la clé privée <clé>
+    help     : Affiche cette aide""")
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2 or sys.argv[1] in ('help', '-h', '--help'):
+        help()
+    elif sys.argv[1] == 'keygen':
+        keygen()
+    elif sys.argv[1] == 'crypt' and len(sys.argv) == 4:
+        crypt(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == 'decrypt' and len(sys.argv) == 4:
+        decrypt(sys.argv[2], sys.argv[3])
+    else:
+        print('Erreur : paramètres invalides')
+        help()
