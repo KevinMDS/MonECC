@@ -48,3 +48,24 @@ def keygen():
     open('monECC.priv', 'w', encoding='utf-8').write(f'---begin monECC private key---\n{base64.b64encode(str(k).encode()).decode()}\n---end monECC key---\n')
     open('monECC.pub', 'w', encoding='utf-8').write(f'---begin monECC public key---\n{base64.b64encode(f"{qx};{qy}".encode()).decode()}\n---end monECC key---\n')
     print('Clés générées: monECC.priv et monECC.pub')
+
+def crypt(pubfile, text):
+    lines = open(pubfile, encoding='utf-8').readlines()
+    if len(lines) < 2 or '---begin monECC public key---' not in lines[0]: 
+        sys.exit('Erreur: clé publique invalide')
+    qx, qy = map(int, base64.b64decode(lines[1]).decode().split(';'))
+    
+    kGx, kGy = None, None
+    while kGx is None:
+        k = random.randint(1, 1000)
+        kGx, kGy = mult(k, Gx, Gy)
+    
+    iv, key = derive_secret(k, qx, qy)
+    
+    padder = padding.PKCS7(128).padder()
+    padded = padder.update(text.encode()) + padder.finalize()
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+    encryptor = cipher.encryptor()
+    ct = encryptor.update(padded) + encryptor.finalize()
+    
+    print(f'{kGx};{kGy}:{base64.b64encode(ct).decode()}')
