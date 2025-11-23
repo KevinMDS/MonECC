@@ -69,3 +69,19 @@ def crypt(pubfile, text):
     ct = encryptor.update(padded) + encryptor.finalize()
     
     print(f'{kGx};{kGy}:{base64.b64encode(ct).decode()}')
+
+def decrypt(privfile, ciphertext):
+    lines = open(privfile, encoding='utf-8').readlines()
+    if len(lines) < 2 or '---begin monECC private key---' not in lines[0]: 
+        sys.exit('Erreur: clé privée invalide')
+    k = int(base64.b64decode(lines[1]).decode())
+    
+    header, ct_b64 = ciphertext.split(':', 1)
+    kGx, kGy = map(int, header.split(';'))
+    ct = base64.b64decode(ct_b64)
+    
+    iv, key = derive_secret(k, kGx, kGy)
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+    padded = cipher.decryptor().update(ct) + cipher.decryptor().finalize()  # BUG ICI
+    unpadder = padding.PKCS7(128).unpadder()
+    print((unpadder.update(padded) + unpadder.finalize()).decode())
