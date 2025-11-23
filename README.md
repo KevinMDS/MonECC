@@ -1,4 +1,4 @@
-# TP MonECC - Chiffrement ECC
+# TP Chiffrement ECC - Cryptographie
 
 ## Nom 
 Kévin MESQUITA DOS SANTOS
